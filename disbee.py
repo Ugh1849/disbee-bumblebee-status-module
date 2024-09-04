@@ -1,20 +1,20 @@
 import core.module
 import core.widget
-import requests
+import aiohttp
+import asyncio
 import json
 import time
 import random
 
 
-def getmessages(id, token):
-
+async def getMessages(id, token):
     headers = {
         'Authorization': token
     }
-
-    r = requests.get(f'https://discord.com/api/v8/channels/{id}/messages', headers=headers)
-    jsonn = json.loads(r.text)
-    return jsonn
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f'https://discord.com/api/v8/channels/{id}/messages', headers=headers) as r:
+            responseJson = await r.json()
+            return responseJson # -- to losers who use snake case ( ͡° ͜ʖ ͡°)
 
 
 class Module(core.module.Module):
@@ -23,7 +23,7 @@ class Module(core.module.Module):
         self.disable = not self.disable
 
     def __init__(self, config, theme):
-        super().__init__(config, theme, core.widget.Widget(self.full_text))
+        super().__init__(config, theme, core.widget.Widget(self.fullText))
 
         self.disable = False
 
@@ -65,7 +65,7 @@ class Module(core.module.Module):
                 file.write("# Add a new line to incicate a new channel id. Example: 15261214836325270 https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-\n")
 
 
-    def full_text(self, widgets):
+    async def fullText(self, widgets):
 
         if self.disable == True:
             return ""
@@ -84,7 +84,8 @@ class Module(core.module.Module):
         result = ""
 
         for id in self.channelIds:
-            jsonstring = str(getmessages(id, self.token))
+            messages = await getMessages(id, self.token)
+            jsonstring = str(messages)
 
             if "content" in jsonstring:
                 index_id = jsonstring.find("id")
