@@ -34,15 +34,15 @@ class Module(core.module.Module):
         self.token = ""
         self.channelIds = []
         
-        self.countdown = 1
-        self.channel_last_notif_ids = {}
-        self.errorincfg = False
+        self.countDown = 1
+        self.channelLastNotifIds = {}
+        self.errorInCfg = False
         self.rangeTime = 0
 
-        self.file_path = 'disbee.cfg'
+        self.filePath = 'disbee.cfg'
 
         try:
-            with open(self.file_path, 'r') as file:
+            with open(self.filePath, 'r') as file:
                 for line in file:
                     if line.startswith('#'):
                         continue
@@ -58,7 +58,7 @@ class Module(core.module.Module):
                     else:
                         self.channelIds.append(line_content)
         except FileNotFoundError:
-            with open(self.file_path, 'w') as file:
+            with open(self.filePath, 'w') as file:
                 file.write("# Replace YOUR_TOKEN_HERE with your discord token\n")
                 file.write("TOKEN YOUR_TOKEN_HERE\n")
                 file.write("COUNTDOWN 5\n")
@@ -88,15 +88,15 @@ class Module(core.module.Module):
             jsonstring = str(messages)
 
             if "content" in jsonstring:
-                index_id = jsonstring.find("id")
-                notif_id = jsonstring[index_id + 4: index_id + 4 + 19]
+                indexId = jsonstring.find("id")
+                notifId = jsonstring[indexId + 4: indexId + 4 + 19]
 
-                if id not in self.channel_last_notif_ids:
-                    self.channel_last_notif_ids[id] = notif_id
+                if id not in self.channeLastNotifIds:
+                    self.channeLastNotifIds[id] = notifId
                 else:
-                    if notif_id != self.channel_last_notif_ids[id]:
+                    if notifId != self.channeLastNotifIds[id]:
                         result += f"New message!"
-                        self.channel_last_notif_ids[id] = notif_id
+                        self.channel_last_notif_ids[id] = notifId
                         self.rangeTime = self.countdown
             else:
                 result += f'Error in channel {id}! {jsonstring}\n'
